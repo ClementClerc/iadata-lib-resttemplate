@@ -1,0 +1,42 @@
+templates:
+  toto: titi
+  restTemplateConfigs:
+    - restTemplateName: restTemplate1
+      proxyConfig:
+        useProxy: true
+        proxyUserNameEnvName: "PROXY_USERNAME"
+        proxyPasswordEnvName: "PROXY_PASSWORD"
+        proxyHostEnvName: "PROXY_HOST"
+        proxyPortEnvName: "PROXY_PORT"
+      url: "http://api1"
+      restTemplateType:
+      login: t
+      password: t
+      token: t
+      loginRawData: t
+      cookieReturnType:
+      cookieLoginName: t
+      incomingCookieName:
+      cookieLoginPrefix:
+      authorizationHeaderName:
+
+
+    - restTemplateName: restTemplate2
+      proxyConfig:
+        useProxy: true
+        proxyUserNameEnvName: "PROXY_USERNAME"
+        proxyPasswordEnvName: "PROXY_PASSWORD"
+        proxyHostEnvName: "PROXY_HOST"
+        proxyPortEnvName: "PROXY_PORT"
+      url: "http://api2"
+      restTemplateType: BEARER
+      login:
+      password:
+      token: TestToken
+      loginRawData:
+      cookieReturnType:
+      cookieLoginName:
+      incomingCookieName:
+      cookieLoginPrefix:
+      authorizationHeaderName:
+
