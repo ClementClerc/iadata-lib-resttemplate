@@ -2,6 +2,7 @@ package fr.toulouse.iadata.resttemplate.config
 
 import fr.toulouse.iadata.resttemplate.properties.RestTemplateProperties
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
@@ -11,7 +12,7 @@ import org.springframework.web.context.support.GenericWebApplicationContext
 import javax.annotation.PostConstruct
 
 @Service
-@Scope("prototype")
+//@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 class RestTemplateFactoryBuilder
 {
     @Autowired private var context : GenericWebApplicationContext? = null
@@ -22,7 +23,9 @@ class RestTemplateFactoryBuilder
     fun registerBeans(){
         for(restTemplateConfig in restTemplateProperties!!.restTemplateConfigs)
         {
-            context!!.registerBean(restTemplateConfig.restTemplateName, RestTemplate::class.java, restTemplateFactory!!.createRestTemplate(restTemplateConfig) )
+            var restTemplate : RestTemplate =  restTemplateFactory!!.createRestTemplate( restTemplateConfig)
+            context!!.registerBean( restTemplateConfig.restTemplateName, RestTemplate::class.java, restTemplate )
+            context?.getBean("restTemplate1")
         }
     }
 

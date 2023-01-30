@@ -14,6 +14,8 @@ import org.apache.http.impl.client.HttpClients
 import org.apache.http.ssl.SSLContexts
 import org.apache.http.ssl.TrustStrategy
 import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.web.client.RestTemplateCustomizer
+import org.springframework.cglib.core.Customizer
 import org.springframework.http.MediaType
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
@@ -25,11 +27,11 @@ import java.security.cert.X509Certificate
 
 class CustomRestTemplateBuilder(){
 
-    private val restTemplateBuilder: RestTemplateBuilder = RestTemplateBuilder()
+    private var restTemplateBuilder: RestTemplateBuilder = RestTemplateBuilder()
     private val log: KLogger = KotlinLogging.logger {  }
 
     fun proxy(restTemplateConfig: RestTemplateConfig): CustomRestTemplateBuilder {
-        restTemplateBuilder
+        restTemplateBuilder = restTemplateBuilder
             .additionalCustomizers(RestTemplateProxyCustomizer(restTemplateConfig.proxyConfig))
         return this
     }
