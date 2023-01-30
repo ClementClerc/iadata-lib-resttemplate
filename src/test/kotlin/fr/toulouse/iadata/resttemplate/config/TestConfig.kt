@@ -6,8 +6,7 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-//@EnableAutoConfiguration
-@ComponentScan( basePackages = ["fr.toulouse"])
+@ComponentScan( basePackages = ["fr.toulouse.iadata"])
 @EnableConfigurationProperties
 class TestConfig {
 }

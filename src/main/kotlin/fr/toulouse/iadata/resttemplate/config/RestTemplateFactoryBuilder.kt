@@ -9,9 +9,10 @@ import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.context.support.GenericWebApplicationContext
+import java.util.function.Supplier
 import javax.annotation.PostConstruct
 
-@Service
+@Configuration
 //@Scope(BeanDefinition.SCOPE_PROTOTYPE)
 class RestTemplateFactoryBuilder
 {
@@ -24,8 +25,7 @@ class RestTemplateFactoryBuilder
         for(restTemplateConfig in restTemplateProperties!!.restTemplateConfigs)
         {
             var restTemplate : RestTemplate =  restTemplateFactory!!.createRestTemplate( restTemplateConfig)
-            context!!.registerBean( restTemplateConfig.restTemplateName, RestTemplate::class.java, restTemplate )
-            context?.getBean("restTemplate1")
+            context!!.registerBean( restTemplateConfig.restTemplateName, RestTemplate::class.java, Supplier{restTemplate} )
         }
     }
 

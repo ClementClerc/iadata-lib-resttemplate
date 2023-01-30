@@ -18,7 +18,7 @@ import org.springframework.web.context.support.GenericWebApplicationContext
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
-@SpringBootTest( classes =  [TestConfig::class,RestTemplateProperties::class,RestTemplateFactoryBuilder::class] )
+@SpringBootTest( classes =  [TestConfig::class] )
 @ActiveProfiles("test")
 class RestTemplateProxyCustomizerTest(
     @Autowired private var restTemplateProperties: RestTemplateProperties,
