@@ -17,7 +17,7 @@ class JsonAuthentCustomizer(val restTemplateConfig : RestTemplateConfig) : RestT
 
     private val sleepingThreadInMin = 1
 
-    private val log : KLogger = KotlinLogging.logger("")
+    private val log : KLogger = KotlinLogging.logger {}
 
     override fun customize(restTemplate: RestTemplate) {
         log.info("[CONFIG-REST] Customize the rest template with addition of auth cookie")
@@ -26,7 +26,7 @@ class JsonAuthentCustomizer(val restTemplateConfig : RestTemplateConfig) : RestT
         var retryNumber = 0
         while (retry && retryNumber < 5) {
             try {
-                val jsonContent: String = restTemplateConfig.loginRawData!!
+                val jsonContent: String = restTemplateConfig.loginRawData
                 val headers = HttpHeaders()
                 headers.contentType = MediaType.APPLICATION_JSON
                 val response: ResponseEntity<String> = restTemplate.exchange(
@@ -34,8 +34,10 @@ class JsonAuthentCustomizer(val restTemplateConfig : RestTemplateConfig) : RestT
                     HttpMethod.POST, HttpEntity(jsonContent, headers),
                     String::class.java
                 )
-                var authCookieValue: String? = ""
-                if (!restTemplateConfig.cookieReturnType.equals("")) {
+                var authCookieValue = ""
+
+
+                if (restTemplateConfig.cookieReturnType != CookieReturnType.NONE) {
                     when (restTemplateConfig.cookieReturnType) {
                         CookieReturnType.BODY -> authCookieValue = getCookieFromBody(response)
                         CookieReturnType.HEADERS -> authCookieValue = getSetCookie(response, restTemplateConfig.incomingCookieName)
@@ -47,7 +49,7 @@ class JsonAuthentCustomizer(val restTemplateConfig : RestTemplateConfig) : RestT
                     }
                     val listInterceptors = restTemplate.interceptors
 
-                    if (authCookieValue != null) {
+                    if (authCookieValue.isNotEmpty()) {
                         listInterceptors.add(
                             HeaderRequestInterceptor(
                                 restTemplateConfig.cookieLoginName,
@@ -61,18 +63,18 @@ class JsonAuthentCustomizer(val restTemplateConfig : RestTemplateConfig) : RestT
                     throw WrongConfigurationException("[CONFIG-REST] No cookie return type set")
                 }
             } catch (e: HttpClientErrorException) {
-                log.warn("[CONFIG-REST] Authentication failed, number of retry : {} error :", retryNumber, e)
+                log.warn("[CONFIG-REST] Authentication failed, number of retry : ${retryNumber} error : ${e.message}")
                 retryNumber += 1
                 try {
                     //wait 4 minutes
-                    log.warn("[CONFIG-REST] Wait for {} minutes", sleepingThreadInMin)
+                    log.warn("[CONFIG-REST] Wait for $sleepingThreadInMin minutes")
                     Thread.sleep(sleepingThreadInMin.toLong() * 60000)
                 } catch (ex: InterruptedException) {
                     log.error("[CONFIG-REST] Error while trying to put the current thread to sleep", ex)
                     Thread.currentThread().interrupt()
                 }
             } catch (e: ResourceAccessException) {
-                log.warn("[CONFIG-REST] Authentication failed, number of retry : {} error :", retryNumber, e)
+                log.warn("[CONFIG-REST] Authentication failed, number of retry : $retryNumber error :", e)
                 retryNumber += 1
                 try {
                     log.warn("[CONFIG-REST] Wait for {} minutes", sleepingThreadInMin)
@@ -84,13 +86,12 @@ class JsonAuthentCustomizer(val restTemplateConfig : RestTemplateConfig) : RestT
             }
         }
         if (retryNumber >= 5 && retry == true) {
-            log.warn("[CONFIG-REST] Authentication failed, number of retry : {} error :", retryNumber)
+            log.warn("[CONFIG-REST] Authentication failed, number of retry : $retryNumber")
         }
     }
 
-    private fun getSetCookie(response: ResponseEntity<String>, headerName: String?): String? {
+    private fun getSetCookie(response: ResponseEntity<String>, headerName: String?): String {
         var headerName: String = headerName ?: "Set-Cookie"
-
         val listCookies = response.headers[headerName]
         if (listCookies != null) {
             for (cookie in listCookies) {
@@ -103,19 +104,19 @@ class JsonAuthentCustomizer(val restTemplateConfig : RestTemplateConfig) : RestT
                 }
             }
         }
-        return null
+        return ""
     }
 
-    private fun getCookieFromBody(response: ResponseEntity<String>): String? {
+    private fun getCookieFromBody(response: ResponseEntity<String>): String {
         try {
             val body =
                 ObjectMapper().readTree(response.body)
-            var cookieName : String ?= restTemplateConfig?.incomingCookieName
+            var cookieName = restTemplateConfig.incomingCookieName
             return body.get(cookieName).asText()
         } catch (e: JsonProcessingException) {
             log.error{ e }
         }
-        return null
+        return ""
 
     }
 }

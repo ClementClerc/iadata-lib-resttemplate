@@ -1,5 +1,6 @@
 package fr.toulouse.iadata.resttemplate.config
 
+import fr.toulouse.iadata.resttemplate.beans.RestTemplateType
 import fr.toulouse.iadata.resttemplate.properties.RestTemplateProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.BeanDefinition
@@ -13,19 +14,21 @@ import java.util.function.Supplier
 import javax.annotation.PostConstruct
 
 @Configuration
-//@Scope(BeanDefinition.SCOPE_PROTOTYPE)
-class RestTemplateFactoryBuilder
+class RestTemplateFactoryBuilder(
+     private var context : GenericWebApplicationContext,
+     private val restTemplateProperties: RestTemplateProperties,
+     private var restTemplateFactory: RestTemplateFactory
+)
 {
-    @Autowired private var context : GenericWebApplicationContext? = null
-    @Autowired private val restTemplateProperties: RestTemplateProperties? = null
-    @Autowired private var restTemplateFactory: RestTemplateFactory? = null
-
     @PostConstruct
     fun registerBeans(){
-        for(restTemplateConfig in restTemplateProperties!!.restTemplateConfigs)
+        for(restTemplateConfig in restTemplateProperties.restTemplateConfigs)
         {
-            var restTemplate : RestTemplate =  restTemplateFactory!!.createRestTemplate( restTemplateConfig)
-            context!!.registerBean( restTemplateConfig.restTemplateName, RestTemplate::class.java, Supplier{restTemplate} )
+            if ( restTemplateConfig.restTemplateType != RestTemplateType.NONE )
+            {
+                var restTemplate : RestTemplate =  restTemplateFactory!!.createRestTemplate( restTemplateConfig)
+                context!!.registerBean( restTemplateConfig.restTemplateName, RestTemplate::class.java, Supplier{restTemplate} )
+            }
         }
     }
 

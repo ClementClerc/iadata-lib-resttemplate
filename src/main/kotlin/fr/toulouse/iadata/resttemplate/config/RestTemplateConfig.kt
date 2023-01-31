@@ -4,7 +4,6 @@ import fr.toulouse.iadata.resttemplate.beans.CookieReturnType
 import fr.toulouse.iadata.resttemplate.beans.RestTemplateType
 import org.springframework.stereotype.Component
 
-@Component
 data class RestTemplateConfig (
     var restTemplateName : String = "",
     var proxyConfig : ProxyConfig = ProxyConfig(),

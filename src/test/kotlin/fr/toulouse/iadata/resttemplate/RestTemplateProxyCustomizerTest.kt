@@ -25,7 +25,7 @@ class RestTemplateProxyCustomizerTest(
 //    @Autowired private var context: GenericWebApplicationContext? ,
     @Autowired private var restTemplateFactory: RestTemplateFactory,
     @Autowired @Qualifier("restTemplate1") private var restTemplate1: RestTemplate,
-//    @Autowired @Qualifier("restTemplate2") private var restTemplate2: RestTemplate
+    @Autowired @Qualifier("restTemplate2") private var restTemplate2: RestTemplate
 ){
 
     @Test
@@ -36,15 +36,22 @@ class RestTemplateProxyCustomizerTest(
 
 
     @Test
-    fun testGetBeans(){
+    fun testGetMultipleBeans(){
         val response : ResponseEntity<String> = restTemplate1.getForEntity(
             UriComponentsBuilder
                 .fromHttpUrl("https://google.com")
                 .build()
                 .toUri(),
             String::class.java)
+
+        val response2 : ResponseEntity<String> = restTemplate2.getForEntity(
+            UriComponentsBuilder
+                .fromHttpUrl("https://google.com")
+                .build()
+                .toUri(),
+            String::class.java)
         Assertions.assertEquals(HttpStatus.OK,response.statusCode)
-        Assertions.assertEquals(HttpStatus.OK,response.statusCode)
+        Assertions.assertEquals(HttpStatus.OK,response2.statusCode)
     }
 
     @Test

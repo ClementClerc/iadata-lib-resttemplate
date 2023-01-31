@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component
 @Component
 @ConfigurationProperties(prefix = "templates")
 data class RestTemplateProperties(
-    var restTemplateConfigs : List<RestTemplateConfig> = ArrayList(),
-    var toto : String = ""){
+    var restTemplateConfigs : List<RestTemplateConfig> = ArrayList()
+    ){
 }

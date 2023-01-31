@@ -1,5 +1,4 @@
 templates:
-  toto: titi
   restTemplateConfigs:
     - restTemplateName: restTemplate1
       proxyConfig:
@@ -10,8 +9,8 @@ templates:
         proxyPortEnvName: "PROXY_PORT"
       url: "http://api1"
       restTemplateType:
-      login: t
-      password: t
+      login: AlertesCC
+      password: b5uGDkZtxwbm4jAp
       token: t
       loginRawData: t
       cookieReturnType:
