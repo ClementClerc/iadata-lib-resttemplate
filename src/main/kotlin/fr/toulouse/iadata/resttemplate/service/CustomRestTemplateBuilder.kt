@@ -67,7 +67,6 @@ class CustomRestTemplateBuilder(){
 
     fun jsonAuthentRestTemplate(restTemplateConfig: RestTemplateConfig): CustomRestTemplateBuilder
     {
-        val interceptors: MutableList<ClientHttpRequestInterceptor> = ArrayList()
         restTemplateBuilder.additionalCustomizers(
             JsonAuthentCustomizer(restTemplateConfig)
         ).additionalInterceptors(
@@ -100,7 +99,7 @@ class CustomRestTemplateBuilder(){
     {
         log.info("[CONFIG-REST] Config used: rest template for data ingest")
         val interceptors: MutableList<ClientHttpRequestInterceptor> = ArrayList()
-        if (restTemplateConfig.token != null) {
+        if (restTemplateConfig.token.isNotEmpty()) {
             log.info("[CONFIG-REST] Token api is not null : use a bearer rest template")
             interceptors.add(
                 HeaderRequestInterceptor(
@@ -125,7 +124,7 @@ class CustomRestTemplateBuilder(){
         restTemplateConfig: RestTemplateConfig
     ): RestTemplate {
 
-        restTemplateConfig.customHeaders?.forEach { key, value ->
+        restTemplateConfig.customHeaders.forEach { key, value ->
             interceptors.add(
                 HeaderRequestInterceptor(
                     key,
@@ -133,7 +132,7 @@ class CustomRestTemplateBuilder(){
                 )
             )
         }
-        restTemplateConfig.customQueryParam?.forEach { key, value ->
+        restTemplateConfig.customQueryParam.forEach { key, value ->
             interceptors.add(
                 HeaderRequestInterceptor(
                     key,

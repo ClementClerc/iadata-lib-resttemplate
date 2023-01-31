@@ -41,7 +41,7 @@ class RestTemplateProxyCustomizer(private val proxyConfig: ProxyConfig) : RestTe
             val proxyHost = System.getenv(proxyConfig.proxyHostEnvName)
             var proxyPort = 80
             try {
-                proxyPort = System.getenv(proxyConfig.proxyPortEnvName).toInt() ?: 0
+                proxyPort = System.getenv(proxyConfig.proxyPortEnvName).toInt()
             } catch (e: Exception ) {
                 hasErrorOnConfig = true
                 log.error("[CONFIG-REST] Unable to parse proxy port to integer", e)
