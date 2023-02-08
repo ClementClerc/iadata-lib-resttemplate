@@ -39,15 +39,13 @@ class CustomRestTemplateBuilder(){
 
 
     fun basicRestTemplate(restTemplateConfig: RestTemplateConfig): CustomRestTemplateBuilder {
-        val interceptors: MutableList<ClientHttpRequestInterceptor> = ArrayList()
-
-
-        interceptors.add(
+        val interceptors: List<ClientHttpRequestInterceptor> = listOf(
             BasicAuthenticationInterceptor(
                 restTemplateConfig.login,
                 restTemplateConfig.password
             )
         )
+
         restTemplateBuilder
             .additionalInterceptors(interceptors)
             .additionalMessageConverters(StringHttpMessageConverter(StandardCharsets.UTF_8))
@@ -56,7 +54,7 @@ class CustomRestTemplateBuilder(){
     }
 
     fun bearerRestTemplate(restTemplateConfig: RestTemplateConfig): CustomRestTemplateBuilder {
-        val interceptors: MutableList<ClientHttpRequestInterceptor> = mutableListOf(HeaderRequestInterceptor(
+        val interceptors: List<ClientHttpRequestInterceptor> = listOf(HeaderRequestInterceptor(
             HttpHeaders.AUTHORIZATION,
             RestTemplateConstants.SECURITY_BEARER_WITHESPACE + restTemplateConfig.token
         ))
@@ -76,13 +74,8 @@ class CustomRestTemplateBuilder(){
         return this
     }
 
-    fun noAuthRestTemplate(restTemplateConfig: RestTemplateConfig): CustomRestTemplateBuilder {
-
-
+    fun noAuthRestTemplate(): CustomRestTemplateBuilder {
         restTemplateBuilder.additionalMessageConverters(StringHttpMessageConverter(StandardCharsets.UTF_8))
-
-
-
         return this
     }
 
@@ -143,10 +136,8 @@ class CustomRestTemplateBuilder(){
 
         log.info("[CONFIG-REST] Header with name ${restTemplateConfig.customHeaders.keys}")
 
-        val listInterceptors = restTemplate.interceptors
-        listInterceptors.addAll(interceptors)
-        restTemplate.interceptors = listInterceptors
-        restTemplate.messageConverters.add(0, StringHttpMessageConverter(StandardCharsets.UTF_8))
+        restTemplate.interceptors.addAll( interceptors )
+        restTemplate.messageConverters.add(StringHttpMessageConverter(StandardCharsets.UTF_8))
         restTemplate.errorHandler = RestTemplateResponseErrorHandler()
         return restTemplate
 
@@ -166,7 +157,6 @@ class CustomRestTemplateBuilder(){
         return this
     }
 
-    fun build():RestTemplate{
-        return restTemplateBuilder.build()
-    }
+    fun build():RestTemplate = restTemplateBuilder.build()
+
 }

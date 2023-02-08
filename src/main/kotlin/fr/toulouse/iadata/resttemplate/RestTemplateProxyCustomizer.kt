@@ -2,6 +2,21 @@ package fr.toulouse.iadata.resttemplate
 
 import fr.toulouse.iadata.resttemplate.config.ProxyConfig
 import mu.KotlinLogging
+import org.apache.hc.client5.http.classic.HttpClient
+import org.apache.hc.client5.http.classic.methods.HttpDelete
+import org.apache.hc.client5.http.classic.methods.HttpGet
+import org.apache.hc.client5.http.classic.methods.HttpHead
+import org.apache.hc.client5.http.classic.methods.HttpOptions
+import org.apache.hc.client5.http.classic.methods.HttpPatch
+import org.apache.hc.client5.http.classic.methods.HttpPost
+import org.apache.hc.client5.http.classic.methods.HttpPut
+import org.apache.hc.client5.http.classic.methods.HttpTrace
+import org.apache.hc.client5.http.config.Configurable
+import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.client5.http.impl.classic.HttpClients
+import org.apache.hc.client5.http.protocol.HttpClientContext
+import org.apache.hc.core5.http.ClassicHttpRequest
+import org.apache.hc.core5.http.protocol.HttpContext
 import org.apache.http.HttpException
 import org.apache.http.HttpHost
 import org.apache.http.HttpRequest
