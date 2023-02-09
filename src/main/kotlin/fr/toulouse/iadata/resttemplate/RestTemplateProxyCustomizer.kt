@@ -2,35 +2,19 @@ package fr.toulouse.iadata.resttemplate
 
 import fr.toulouse.iadata.resttemplate.config.ProxyConfig
 import mu.KotlinLogging
-import org.apache.hc.client5.http.classic.HttpClient
-import org.apache.hc.client5.http.classic.methods.HttpDelete
-import org.apache.hc.client5.http.classic.methods.HttpGet
-import org.apache.hc.client5.http.classic.methods.HttpHead
-import org.apache.hc.client5.http.classic.methods.HttpOptions
-import org.apache.hc.client5.http.classic.methods.HttpPatch
-import org.apache.hc.client5.http.classic.methods.HttpPost
-import org.apache.hc.client5.http.classic.methods.HttpPut
-import org.apache.hc.client5.http.classic.methods.HttpTrace
-import org.apache.hc.client5.http.config.Configurable
-import org.apache.hc.client5.http.config.RequestConfig
+import org.apache.hc.client5.http.auth.*
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder
 import org.apache.hc.client5.http.impl.classic.HttpClients
-import org.apache.hc.client5.http.protocol.HttpClientContext
-import org.apache.hc.core5.http.ClassicHttpRequest
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
+import org.apache.hc.client5.http.impl.routing.DefaultProxyRoutePlanner
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory
+import org.apache.hc.core5.http.HttpException
+import org.apache.hc.core5.http.HttpHost
+import org.apache.hc.core5.http.HttpRequest
 import org.apache.hc.core5.http.protocol.HttpContext
-import org.apache.http.HttpException
-import org.apache.http.HttpHost
-import org.apache.http.HttpRequest
-import org.apache.http.auth.AuthScope
-import org.apache.http.auth.Credentials
-import org.apache.http.auth.UsernamePasswordCredentials
-import org.apache.http.client.CredentialsProvider
-import org.apache.http.client.HttpClient
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory
-import org.apache.http.impl.client.BasicCredentialsProvider
-import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner
-import org.apache.http.protocol.HttpContext
-import org.apache.http.ssl.TrustStrategy
+import org.apache.hc.core5.ssl.SSLContexts
+import org.apache.hc.core5.ssl.TrustStrategy
 import org.springframework.boot.web.client.RestTemplateCustomizer
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.web.client.RestTemplate
@@ -69,16 +53,15 @@ class RestTemplateProxyCustomizer(private val proxyConfig: ProxyConfig) : RestTe
                 return
                 // TODO : Make the proxy customizer available for non auth proxies.
             }
-            val credentials: Credentials = UsernamePasswordCredentials(proxyUserName, proxyPassword)
-            val authScope: AuthScope = AuthScope.ANY
-            val credsProvider: CredentialsProvider = BasicCredentialsProvider()
-            credsProvider.setCredentials(authScope, credentials)
+            val credentials: Credentials = UsernamePasswordCredentials(proxyUserName, proxyPassword.toCharArray())
+            var credsProvider: CredentialsStore = BasicCredentialsProvider()
+            credsProvider.setCredentials( AuthScope( HttpHost( "*")), credentials )
             val proxy = HttpHost(proxyHost, proxyPort)
             httpClientBuilder.setDefaultCredentialsProvider(credsProvider)
                 .setRoutePlanner(object : DefaultProxyRoutePlanner(proxy) {
                     @Throws(HttpException::class)
-                    override fun determineProxy(target: HttpHost?, request: HttpRequest?, context: HttpContext?): HttpHost {
-                        return super.determineProxy(target, request, context)
+                    override fun determineProxy(target: HttpHost?, context: HttpContext?): HttpHost {
+                        return super.determineProxy(target, context)
                     }
                 })
         } else {
@@ -89,8 +72,7 @@ class RestTemplateProxyCustomizer(private val proxyConfig: ProxyConfig) : RestTe
             TrustStrategy { chain: Array<X509Certificate?>?, authType: String? -> true }
         var sslContext: SSLContext? = null
         try {
-            sslContext =
-                org.apache.http.ssl.SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build()
+            sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build()
         } catch (e: NoSuchAlgorithmException) {
             log.error("[CONFIG-REST] Error while trying to config the SSL context", e)
         } catch (e: KeyStoreException) {
@@ -99,7 +81,11 @@ class RestTemplateProxyCustomizer(private val proxyConfig: ProxyConfig) : RestTe
             log.error("[CONFIG-REST] Error while trying to config the SSL context", e)
         }
         val csf = SSLConnectionSocketFactory(sslContext)
-        val httpClient: HttpClient = httpClientBuilder.setSSLSocketFactory(csf).build()
+
+        val cm = PoolingHttpClientConnectionManagerBuilder.create()
+            .setSSLSocketFactory( csf)
+            .build();
+        val httpClient = HttpClients.custom().setConnectionManager( cm).build()
         restTemplate.requestFactory = HttpComponentsClientHttpRequestFactory(httpClient)
     }
 

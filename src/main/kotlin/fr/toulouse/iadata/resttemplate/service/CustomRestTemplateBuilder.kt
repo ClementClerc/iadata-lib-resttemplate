@@ -8,14 +8,13 @@ import fr.toulouse.iadata.resttemplate.constants.RestTemplateConstants
 import fr.toulouse.iadata.resttemplate.handler.RestTemplateResponseErrorHandler
 import mu.KLogger
 import mu.KotlinLogging
-import org.apache.http.HttpHeaders
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory
-import org.apache.http.impl.client.HttpClients
-import org.apache.http.ssl.SSLContexts
-import org.apache.http.ssl.TrustStrategy
+import org.apache.hc.core5.http.HttpHeaders
+import org.apache.hc.core5.ssl.SSLContexts
+import org.apache.hc.core5.ssl.TrustStrategy
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
-import org.springframework.boot.web.client.RestTemplateCustomizer
-import org.springframework.cglib.core.Customizer
 import org.springframework.http.MediaType
 import org.springframework.http.client.ClientHttpRequestInterceptor
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
@@ -111,49 +110,49 @@ class CustomRestTemplateBuilder(){
         return this
     }
 
-    fun customRestTemplate(
-        interceptors: MutableList<ClientHttpRequestInterceptor>,
-        restTemplate: RestTemplate,
+    fun addCustomHeaders(
         restTemplateConfig: RestTemplateConfig
-    ): RestTemplate {
+    ): CustomRestTemplateBuilder {
+
+
 
         restTemplateConfig.customHeaders.forEach { key, value ->
-            interceptors.add(
-                HeaderRequestInterceptor(
-                    key,
-                    value
-                )
-            )
+            restTemplateBuilder = restTemplateBuilder.additionalInterceptors(HeaderRequestInterceptor(
+                key,
+                value
+            ))
         }
         restTemplateConfig.customQueryParam.forEach { key, value ->
-            interceptors.add(
-                HeaderRequestInterceptor(
-                    key,
-                    value
-                )
-            )
+            restTemplateBuilder = restTemplateBuilder.additionalInterceptors(HeaderRequestInterceptor(
+                key,
+                value
+            ))
         }
 
         log.info("[CONFIG-REST] Header with name ${restTemplateConfig.customHeaders.keys}")
 
-        restTemplate.interceptors.addAll( interceptors )
-        restTemplate.messageConverters.add(StringHttpMessageConverter(StandardCharsets.UTF_8))
-        restTemplate.errorHandler = RestTemplateResponseErrorHandler()
-        return restTemplate
+        restTemplateBuilder.errorHandler(RestTemplateResponseErrorHandler())
+        restTemplateBuilder.additionalMessageConverters(StringHttpMessageConverter(StandardCharsets.UTF_8))
+
+        return this
 
     }
 
 
 
-    fun disableSSL() : CustomRestTemplateBuilder {
+    fun disableSSL() : CustomRestTemplateBuilder
+    {
         val acceptingTrustStrategy =
             TrustStrategy { chain: Array<X509Certificate?>?, authType: String? -> true }
         val sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build()
         val csf = SSLConnectionSocketFactory(sslContext)
-        val httpClient = HttpClients.custom().setSSLSocketFactory(csf).build()
+        val cm = PoolingHttpClientConnectionManagerBuilder.create()
+            .setSSLSocketFactory( csf)
+            .build();
+        val httpClient = HttpClients.custom().setConnectionManager( cm).build()
         val requestFactory = HttpComponentsClientHttpRequestFactory()
         requestFactory.httpClient = httpClient
-        restTemplateBuilder.requestFactory{requestFactory}
+        restTemplateBuilder = restTemplateBuilder.requestFactory{ r -> requestFactory }
         return this
     }
 

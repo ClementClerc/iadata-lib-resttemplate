@@ -10,18 +10,12 @@ import java.io.IOException
 class RestTemplateResponseErrorHandler : ResponseErrorHandler {
     @Throws(IOException::class)
     override fun hasError(httpResponse: ClientHttpResponse): Boolean {
-        return (httpResponse.statusCode.series() == HttpStatus.Series.CLIENT_ERROR
-                || httpResponse.statusCode.series() == HttpStatus.Series.SERVER_ERROR)
+        return httpResponse.statusCode.isError
     }
 
     @Throws(IOException::class)
-    override fun handleError(httpResponse: ClientHttpResponse) {
-        if (httpResponse.statusCode.series() == HttpStatus.Series.SERVER_ERROR) {
-            // handle SERVER_ERROR
-        } else if (httpResponse.statusCode.series() == HttpStatus.Series.CLIENT_ERROR) {
-            // handle CLIENT_ERROR
-            if (httpResponse.statusCode == HttpStatus.NOT_FOUND) {
-            }
-        }
+    override fun handleError(httpResponse: ClientHttpResponse)
+    {
+
     }
 }

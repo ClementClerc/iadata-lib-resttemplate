@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component
 import org.springframework.web.client.RestTemplate
 
 @Component
-@Scope("prototype")
 class RestTemplateFactory() {
 
 
@@ -46,7 +45,7 @@ class RestTemplateFactory() {
 
             RestTemplateType.NONE -> {
                 log.info("[CONFIG-REST] Config used: rest template with basic authentication")
-                customRestTemplateBuilder.noAuthRestTemplate(restTemplateConfig)
+                customRestTemplateBuilder.noAuthRestTemplate()
             }
 
             else -> {
@@ -54,7 +53,7 @@ class RestTemplateFactory() {
                 log.warn(
                     "[CONFIG-REST] You need to specify explicitly in properties file which authent you want to use"
                 )
-                customRestTemplateBuilder.noAuthRestTemplate(restTemplateConfig)
+                customRestTemplateBuilder.noAuthRestTemplate()
             }
         }
 
@@ -62,7 +61,15 @@ class RestTemplateFactory() {
             customRestTemplateBuilder.proxy(restTemplateConfig)
         }
 
+        if ( restTemplateConfig.disableSSL )
+        {
+            customRestTemplateBuilder.disableSSL()
+        }
 
+        if ( restTemplateConfig.customHeaders.size > 0 )
+        {
+            customRestTemplateBuilder.addCustomHeaders( restTemplateConfig )
+        }
 
         return customRestTemplateBuilder.build()
     }

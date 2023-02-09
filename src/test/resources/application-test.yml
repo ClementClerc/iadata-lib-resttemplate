@@ -18,6 +18,7 @@ templates:
       incomingCookieName:
       cookieLoginPrefix:
       authorizationHeaderName:
+      disableSSL: true
 
 
     - restTemplateName: restTemplate2
@@ -38,4 +39,38 @@ templates:
       incomingCookieName:
       cookieLoginPrefix:
       authorizationHeaderName:
+      disableSSL: true
+
+    - restTemplateName: restTemplate3
+      proxyConfig:
+        useProxy: false
+        proxyUserNameEnvName: "PROXY_USERNAME"
+        proxyPasswordEnvName: "PROXY_PASSWORD"
+        proxyHostEnvName: "PROXY_HOST"
+        proxyPortEnvName: "PROXY_PORT"
+      url: "http://api2"
+      restTemplateType: BEARER
+      login:
+      password:
+      token: TestToken
+      loginRawData:
+      cookieReturnType:
+      cookieLoginName:
+      incomingCookieName:
+      cookieLoginPrefix:
+      authorizationHeaderName:
+      disableSSL: true
+
+    - restTemplateName: restTemplate4
+      proxyConfig:
+        useProxy: false
+        proxyUserNameEnvName: "PROXY_USERNAME"
+        proxyPasswordEnvName: "PROXY_PASSWORD"
+        proxyHostEnvName: "PROXY_HOST"
+        proxyPortEnvName: "PROXY_PORT"
+      restTemplateType: NONE
+      customHeaders:
+        Authorization: ApiKey QkszUHIzUUJXX1c3RTNWYWIxNkM6N2ZJanhjUDlURE9PLS1UWEZab25MUQ==
+      disableSSL: true
+
 
