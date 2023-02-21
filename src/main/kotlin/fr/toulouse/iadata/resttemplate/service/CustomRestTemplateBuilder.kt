@@ -45,7 +45,7 @@ class CustomRestTemplateBuilder(){
             )
         )
 
-        restTemplateBuilder
+        restTemplateBuilder = restTemplateBuilder
             .additionalInterceptors(interceptors)
             .additionalMessageConverters(StringHttpMessageConverter(StandardCharsets.UTF_8))
         return this
@@ -57,7 +57,7 @@ class CustomRestTemplateBuilder(){
             HttpHeaders.AUTHORIZATION,
             RestTemplateConstants.SECURITY_BEARER_WITHESPACE + restTemplateConfig.token
         ))
-        restTemplateBuilder.additionalInterceptors(interceptors)
+        restTemplateBuilder = restTemplateBuilder.additionalInterceptors(interceptors)
         return this
 
     }
@@ -74,12 +74,12 @@ class CustomRestTemplateBuilder(){
     }
 
     fun noAuthRestTemplate(): CustomRestTemplateBuilder {
-        restTemplateBuilder.additionalMessageConverters(StringHttpMessageConverter(StandardCharsets.UTF_8))
+        restTemplateBuilder = restTemplateBuilder.additionalMessageConverters(StringHttpMessageConverter(StandardCharsets.UTF_8))
         return this
     }
 
     fun opendataRestTemplate(restTemplateConfig: RestTemplateConfig): CustomRestTemplateBuilder {
-        restTemplateBuilder.additionalCustomizers(
+        restTemplateBuilder = restTemplateBuilder.additionalCustomizers(
             RestTemplateProxyCustomizer(
                 restTemplateConfig.proxyConfig
             )
@@ -102,11 +102,11 @@ class CustomRestTemplateBuilder(){
             interceptors.add(
                 HeaderRequestInterceptor(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON.toString())
             )
-            restTemplateBuilder.additionalInterceptors(interceptors)
+            restTemplateBuilder = restTemplateBuilder.additionalInterceptors(interceptors)
         } else {
             log.info("[CONFIG-REST] No token found: use a non-authenticated rest template")
         }
-        restTemplateBuilder.additionalMessageConverters( StringHttpMessageConverter(StandardCharsets.UTF_8))
+        restTemplateBuilder = restTemplateBuilder.additionalMessageConverters( StringHttpMessageConverter(StandardCharsets.UTF_8))
         return this
     }
 
@@ -131,8 +131,8 @@ class CustomRestTemplateBuilder(){
 
         log.info("[CONFIG-REST] Header with name ${restTemplateConfig.customHeaders.keys}")
 
-        restTemplateBuilder.errorHandler(RestTemplateResponseErrorHandler())
-        restTemplateBuilder.additionalMessageConverters(StringHttpMessageConverter(StandardCharsets.UTF_8))
+        restTemplateBuilder = restTemplateBuilder.errorHandler(RestTemplateResponseErrorHandler())
+        restTemplateBuilder = restTemplateBuilder.additionalMessageConverters(StringHttpMessageConverter(StandardCharsets.UTF_8))
 
         return this
 

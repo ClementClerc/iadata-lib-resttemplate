@@ -8,5 +8,13 @@ import org.springframework.stereotype.Component
 @ConfigurationProperties(prefix = "templates")
 data class RestTemplateProperties(
     var restTemplateConfigs : List<RestTemplateConfig> = ArrayList()
-    ){
+    ) {
+
+    fun getRestTemplateConfigByName(beanName: String): RestTemplateConfig? {
+
+        var restTemplateConfig: RestTemplateConfig? =
+            restTemplateConfigs.find { conf -> beanName.equals(conf.restTemplateName) }
+
+        return restTemplateConfig
+    }
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 data class RestTemplateConfig (
     var restTemplateName : String = "",
     var proxyConfig : ProxyConfig = ProxyConfig(),
-    var restTemplateType : RestTemplateType = RestTemplateType.NONE,
+    var restTemplateType : RestTemplateType = RestTemplateType.DEFAULT,
     var login : String = "",
     var password : String = "",
     var token : String = "",

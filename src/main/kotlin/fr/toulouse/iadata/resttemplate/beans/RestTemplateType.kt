@@ -4,7 +4,7 @@ enum class RestTemplateType {
     BASIC,
     BEARER,
     JSON,
-    NONE,
+    DEFAULT,
     APIDATA,
     OPENDATA,
     CUSTOM

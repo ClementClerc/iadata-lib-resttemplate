@@ -43,7 +43,7 @@ class RestTemplateFactory() {
                 customRestTemplateBuilder.opendataRestTemplate(restTemplateConfig)
             }
 
-            RestTemplateType.NONE -> {
+            RestTemplateType.DEFAULT -> {
                 log.info("[CONFIG-REST] Config used: rest template with basic authentication")
                 customRestTemplateBuilder.noAuthRestTemplate()
             }
